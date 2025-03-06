@@ -1,0 +1,210 @@
+.hidden {
+  visibility: hidden; /* Usamos visibility en lugar de display */
+  opacity: 0;
+  pointer-events: none; /* Para que no pueda interactuar cuando esté oculto */
+}
+
+.modal {
+  position: absolute; /* Cambiado de fixed a absolute */
+  bottom: 20px;
+  right: 20px;
+  width: 450px;
+  height: 700px;
+  background-color: #fff;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  border-radius: 10px;
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  transition: all 0.3s ease;
+
+}
+
+/* Cabecera del chat, con separación entre título y íconos */
+.modal-header {
+  background-color: #2ecc71;
+  padding: 10px;
+  display: flex;
+  align-items: center;
+  border-radius: 10px 10px 0 0;
+  position: relative;
+  cursor: grab; /* Cambia el cursor en la cabecera */
+  user-select: none; /* Evita que se seleccione contenido en la cabecera */
+}
+
+/* Al arrastrar, muestra un cursor de "grabbing" */
+.modal-header:active {
+  cursor: grabbing;
+}
+
+/* Título del chat alineado a la izquierda (comentado para centrar más adelante) */
+.chat-title {
+  display: flex;
+  flex-direction: column;
+  color: white;
+  flex-grow: 1;
+  margin-left: 20px; /* Ajuste para separación del logo */
+  /*!* Para centrar el título, se podría usar text-align: center*/
+}
+
+.chat-heading {
+  font-size: 20px;
+  font-weight: bold;
+}
+
+.chat-subheading {
+  font-size: 14px;
+  margin-top: 4px;
+}
+
+.modal-header .icon-container {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  position: absolute;
+  top: 0;
+  right: 10px;
+  height: 100%;
+  gap: 10px; /* Espacio entre los íconos */
+}
+
+.modal-header .icon-container .more-options,
+.modal-header .icon-container .close {
+  font-size: 24px; /* Ajusta el tamaño de los íconos aquí */
+  color: white;
+  cursor: pointer;
+  transition: transform 0.2s, color 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px; /* Proporcional a su tamaño */
+  height: 36px; /* Proporcional a su tamaño */
+}
+
+.modal-header .icon-container .more-options:hover,
+.modal-header .icon-container .close:hover {
+  transform: scale(1.2); /* Aumenta el tamaño al pasar el ratón */
+  color: #ecf0f1;
+}
+
+
+/* Cuerpo del modal */
+.modal-body {
+  display: flex;
+  flex-direction: column;
+  height: calc(100% - 50px);
+  padding: 10px;
+  overflow-y: hidden;
+  cursor: auto; /* Cursor normal para el cuerpo del chat */
+}
+
+/* Área de mensajes con desplazamiento */
+#chat-display {
+  overflow-y: auto;
+  flex-grow: 1;
+  max-height: 100%; /* Permitir que el contenedor use todo el espacio vertical disponible */
+  padding-right: 5px;
+  margin-bottom: 10px;
+  height: 100%; /* Asegura que tenga la altura máxima permitida por su contenedor */
+}
+
+/* Estilo personalizado para el scroll del contenedor de mensajes */
+#chat-display::-webkit-scrollbar {
+  width: 8px; /* Ancho de la barra de desplazamiento */
+}
+
+#chat-display::-webkit-scrollbar-track {
+  background: #f2f2f2; /* Color del fondo del track */
+  border-radius: 10px; /* Bordes redondeados para la pista */
+}
+
+#chat-display::-webkit-scrollbar-thumb {
+  background-color: rgba(174, 174, 174, 0.9); /* Color del pulgar del scroll, usando un tono verde translúcido */
+  border-radius: 10px; /* Bordes redondeados para el pulgar */
+  border: 2px solid #f2f2f2; /* Espacio entre el pulgar y la pista */
+}
+
+#chat-display::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(174, 174, 174, 0.9); /* Color más oscuro al pasar el mouse */
+}
+
+/* Compatibilidad con otros navegadores */
+#chat-display {
+  scrollbar-width: thin; /* Ancho del scroll en Firefox */
+  scrollbar-color: rgba(174, 174, 174, 0.9) #f2f2f2; /* Color del pulgar y de la pista en Firefox */
+}
+
+/* Flecha para desplazarse hacia abajo */
+.scroll-to-bottom {
+  position: absolute;
+  bottom: 190px; /* Más arriba del input */
+  left: 4%; /* Centrar horizontalmente */
+  /*transform: translateX(-50%);*/
+  background: linear-gradient(135deg, rgba(236, 112, 99, 0.8), rgba(236, 112, 99, 0.6)); /* Degradado con los colores proporcionados */
+  color: white;
+  font-size: 24px;
+  width: 40px; /* Tamaño más impactante */
+  height: 40px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 50%;
+  cursor: pointer;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Sombra suave */
+  /*transition: transform 0.3s ease, box-shadow 0.3s ease, background 0.3s ease; !* Transición suave *!*/
+}
+
+.scroll-to-bottom:hover {
+  transform: scale(1.1); /* Escalar un poco al hacer hover */
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3); /* Sombra más profunda en hover */
+  background: linear-gradient(135deg, rgba(236, 112, 99, 1), rgba(236, 112, 99, 0.8)); /* Degradado más intenso en hover */
+}
+
+.options-menu {
+  position: absolute;
+  top: 80px; /* Manteniendo la posición */
+  right: 12px;
+  background: linear-gradient(135deg, #1D8348, #2ecc71); /* Degradado de verde oscuro a verde claro */
+  border-radius: 12px;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3); /* Sombra para efecto de elevación */
+  padding: 15px;
+  width: 400px; /* Manteniendo el ancho */
+  display: flex;
+  flex-direction: column;
+  opacity: 0;
+  transform: translateY(-10px);
+  transition: opacity 0.4s ease, transform 0.4s ease;
+  z-index: 10;
+}
+
+.options-menu.show {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+
+.options-menu .menu-option {
+  display: flex;
+  align-items: center;
+  color: #fff;
+  padding: 6px 12px;
+  margin: 2px 0;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  border-radius: 6px;
+  transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
+}
+
+.options-menu .menu-option i {
+  font-size: 16px;
+  margin-right: 8px;
+  transition: color 0.3s ease;
+}
+
+.options-menu .menu-option:hover {
+  background: linear-gradient(135deg, #28a745, #34d058);
+  transform: scale(1.05);
+  box-shadow: 0 0 10px rgba(52, 208, 88, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
