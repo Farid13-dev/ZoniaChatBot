@@ -1,0 +1,134 @@
+<div class="upload-container">
+  <div class="grid-container">
+
+    <!-- 🛠️ Gestión de Bases de Datos -->
+    <div class="config-section">
+      <h3>🛠️ Bases de Datos (SQLite y Milvus)</h3>
+      <div class="buttons">
+        <button class="btn-green" (click)="createDatabase()" [disabled]="loading">🗂️ Crear BD</button>
+        <button class="btn-red" (click)="deleteDatabase()" [disabled]="loading">🗑️ Eliminar BD</button>
+      </div>
+      <!-- 📂 Documentos en Milvus -->
+
+      <h3>📂 Documentos Indexados en Milvus</h3>
+
+      @if (milvusDocs.length === 0) {
+        <div>
+          <p>📭 No hay documentos indexados en Milvus.</p>
+        </div>
+      }
+
+      @if (milvusDocs.length > 0) {
+        <ul class="milvus-list">
+          @for (doc of milvusDocs; track doc) {
+            <li class="milvus-item">
+              <div class="milvus-info">
+                <strong>📄 {{ doc.metadata.file_name || '📄Sin nombre' }}</strong>
+                <span class="doc-id">ID: {{ doc.document_id }}</span>
+              </div>
+              <button class="btn-red" (click)="deleteMilvusDocument(doc.document_id)">🗑️ Eliminar</button>
+            </li>
+          }
+        </ul>
+      }
+    </div>
+
+    <!-- 📎 Subir y Gestionar Archivos -->
+    <div class="config-section">
+      <h3>📎 Subir Archivos</h3>
+
+      <label for="fileInput">📁 Seleccionar Archivo:</label>
+      <input type="file" id="fileInput" accept=".pdf,.csv" (change)="onFileSelected($event)" [disabled]="loading">
+
+      <div class="buttons">
+        <button class="btn-green" (click)="includeSource()" [disabled]="!selectedFile && !sourceUrl.trim()">✅ Subir
+        </button>
+        <button class="btn-orange" (click)="clearSources()" [disabled]="loading || sourcesToAdd.length === 0">🧹
+          Limpiar
+        </button>
+      </div>
+
+      <!-- 📂 Archivos Subidos -->
+
+      <h3>📂 Archivos en Ruta</h3>
+
+      @if (sourcesToAdd.length > 0) {
+        <ul>
+          @for (file of sourcesToAdd; track file) {
+            <li>
+              📄 {{ file }}
+              <button class="btn-red" (click)="deleteFile(file)">🗑️ Eliminar</button>
+            </li>
+          }
+        </ul>
+      } @else {
+        <p>No hay archivos disponibles.</p>
+      }
+
+    </div>
+
+    <!-- 📊 Archivos en SQLite -->
+    <div class="config-section">
+      <h3>📊 Gestionar en SQLite</h3>
+
+      <label for="sourceSelect">📂 Seleccionar Archivo:</label>
+      <select id="sourceSelect" [(ngModel)]="selectedSource">
+        @for (source of sourcesToAdd; track source) {
+          <option [value]="source">{{ source }}</option>
+        }
+      </select>
+
+      <label for="sqliteCategory">🏷️ Categoría:</label>
+      <input type="text" id="sqliteCategory" placeholder="Ingrese categoría" [(ngModel)]="sqliteCategory"
+        [disabled]="!selectedSource">
+
+        <label for="sqliteDescripcion">🏷️ Descripción:</label>
+        <input type="text" id="sqliteDescripcion" placeholder="Ingrese descripción" [(ngModel)]="sqliteDescripcion"
+          [disabled]="!selectedSource">
+
+
+          <div class="buttons">
+            <button class="btn-green" (click)="uploadToSQLite()" [disabled]="!selectedSource || !sqliteCategory">⬆️ Subir
+              a SQLite
+            </button>
+          </div>
+          <h3>📂 Archivos en SQLITE</h3>
+          @if (uploadedPdfs.length > 0) {
+            <ul>
+              @for (pdf of uploadedPdfs; track pdf) {
+                <li>
+                  <strong>{{ pdf.category }}</strong>
+                  <button class="btn-red" (click)="deleteSqliteFile(pdf.id)">🗑️ Eliminar</button>
+                  <button class="btn-blue" (click)="abrirModalEdicion(pdf.id)">✏️ Editar</button>
+                </li>
+              }
+            </ul>
+          }
+        </div>
+      </div>
+    </div>
+
+    <!-- 🪟 Modal de edición de documento con editor Quill -->
+    @if (isEditModalOpen) {
+      <div class="modal-backdrop">
+        <div class="modal-content">
+          <h3>✏️ Editar Documento</h3>
+          <label>📌 Nombre:</label>
+          <input [(ngModel)]="editForm.name" type="text"/>
+          <label>🏷️ Categoría:</label>
+          <input [(ngModel)]="editForm.categoria" type="text"/>
+          <label>📝 Descripción enriquecida:</label>
+          <quill-editor
+            [(ngModel)]="editForm.descripcion"
+            [modules]="quillModules"
+            [styles]="{ height: '250px' }"
+            placeholder="Escribe una descripción estructurada con viñetas, encabezados, etc.">
+          </quill-editor>
+          <div class="modal-buttons">
+            <button class="btn-green" (click)="guardarCambios()">💾 Guardar</button>
+            <button class="btn-red" (click)="cerrarModal()">❌ Cancelar</button>
+          </div>
+        </div>
+      </div>
+    }
+

@@ -1,0 +1,125 @@
+<div class="admin-container">
+  <div class="grid-container">
+
+    <!-- 📂 BASE DE DATOS SQLITE -->
+    <div class="config-section">
+      <fieldset>
+        <legend>📂 Base de Datos en SQLite</legend>
+
+        <select [(ngModel)]="selectedSqliteDocument" (change)="onDocumentSelect()">
+          @for (doc of sqliteDocuments; track doc) {
+            <option [value]="doc.id">{{ doc.categoria }}</option>
+          }
+        </select>
+      </fieldset>
+
+      <!-- ✂️ SPLITTER -->
+      <fieldset>
+        <legend>✂️ Splitter</legend>
+
+        <label>🔹 Modo:</label>
+        <select [(ngModel)]="selectedSplitterMode">
+          @for (mode of splitterAvailableModes; track mode) {
+            <option [value]="mode">{{ mode }}</option>
+          }
+        </select>
+
+        <label>🔹 Tokenizer:</label>
+        <select [(ngModel)]="selectedSplitterTokenizer">
+          @for (tokenizer of splitterAvailableTokenizers; track tokenizer) {
+            <option [value]="tokenizer">{{ tokenizer }}</option>
+          }
+        </select>
+
+        <label>🔢 Chunk Size: {{ chunkSize }}</label>
+        <input type="range" [(ngModel)]="chunkSize" min="100" max="8000" step="50">
+
+        <label>🔢 Chunk Overlap: {{ chunkOverlap }}</label>
+        <input type="range" [(ngModel)]="chunkOverlap" min="0" max="500" step="10">
+
+        <label>🔹 Window Size: {{ windowSize }}</label>
+        <input type="range" [(ngModel)]="windowSize" min="1" max="10">
+      </fieldset>
+    </div>
+
+    <!-- 🧠 EMBEDDINGS -->
+    <div class="config-section">
+      <fieldset>
+        <legend>🧠 Embeddings</legend>
+
+        <label>🔹 Proveedor:</label>
+        <select [(ngModel)]="selectedEmbeddingProvider" (change)="onProviderChange()">
+          @for (provider of embeddingProviders; track provider) {
+            <option [value]="provider">
+              {{ provider | titlecase }}
+            </option>
+          }
+        </select>
+
+        @if (selectedEmbeddingProvider !== 'sentence-transformers' && selectedEmbeddingProvider !== 'huggingface') {
+          <div
+            >
+            <label>🔑 API Key:</label>
+            <input type="password" [(ngModel)]="embeddingApiKey" placeholder="Ingrese API Key">
+          </div>
+        }
+
+        <label>📂 Modelo:</label>
+        <select [(ngModel)]="embeddingModelPath">
+          @for (model of embeddingAvailableModels[selectedEmbeddingProvider] || []; track model) {
+            <option [value]="model">
+              {{ model }}
+            </option>
+          }
+        </select>
+
+        <label>🔢 Max Length: {{ maxLength }}</label>
+        <input type="range" [(ngModel)]="maxLength" min="128" max="4096" step="64">
+
+        <label>🔢 similarity_top_k: {{ similarityTopK }}</label>
+        <input type="range" [(ngModel)]="similarityTopK" min="1" max="50">
+
+        <label>🔢 sparse_top_k: {{ sparseTopK }}</label>
+        <input type="range" [(ngModel)]="sparseTopK" min="1" max="50">
+
+
+      </fieldset>
+    </div>
+
+    <!-- 📊 RERANKING -->
+    <div class="config-section">
+      <fieldset>
+        <legend>📊 Reranking</legend>
+
+        <label>🔹 Proveedor:</label>
+        <select [(ngModel)]="selectedRerankingProvider" (change)="onRerankingProviderChange()">
+          @for (provider of rerankingProviders; track provider) {
+            <option [value]="provider">
+              {{ provider | titlecase }}
+            </option>
+          }
+        </select>
+
+        <label>📂 Modelo:</label>
+        <select [(ngModel)]="rerankingModelPath">
+          @for (model of rerankingAvailableModels[selectedRerankingProvider] || []; track model) {
+            <option [value]="model">
+              {{ model }}
+            </option>
+          }
+        </select>
+
+        <label>🔢 Top N: {{ topN }}</label>
+        <input type="range" [(ngModel)]="topN" min="1" max="50">
+
+        <label>🔹 Max Length: {{ rerankingMaxLength }}</label>
+        <input type="range" [(ngModel)]="rerankingMaxLength" min="128" max="4096" step="64">
+      </fieldset>
+    </div>
+  </div>
+
+  <!-- 📌 BOTONES DE ACCIÓN -->
+  <div class="button-group">
+    <button class="btn btn-blue" (click)="saveConfig()">💾 Guardar Configuración</button>
+  </div>
+</div>

@@ -1,0 +1,64 @@
+<div class="initialize-qa-container">
+  <h2>⚙️ Configuración Inicial</h2>
+
+  <div class="form-grid">
+    <div class="left-column">
+      <section class="llm-selection">
+        <h3>🧠 Modelo de Lenguaje (LLM)</h3>
+        <select [(ngModel)]="selectedLLM" (change)="onLLMChange()">
+          @for (provider of llmProviders; track provider) {
+            <option [value]="provider">{{ provider | titlecase }}</option>
+          }
+        </select>
+      </section>
+
+      <section class="modelpath-config">
+        <h3>📁 Ruta del Modelo</h3>
+        <select [(ngModel)]="modelPath">
+          @for (model of llmAvailableModels[selectedLLM] || []; track model) {
+            <option [value]="model">{{ model }}</option>
+          }
+        </select>
+      </section>
+
+      @if (selectedLLM !== 'local') {
+        <section class="apikey-config">
+          <h3>🔑 API Key</h3>
+          <input type="password" [(ngModel)]="apiKey" placeholder="Introduce tu API Key..."/>
+        </section>
+      }
+    </div>
+
+    <div class="right-column">
+      <section class="llm-parameters">
+        <h3>⚙️ Parámetros del Modelo</h3>
+
+        <label>🔥 Temperatura: {{ temperature }}</label>
+        <input type="range" [(ngModel)]="temperature" min="0" max="1" step="0.01">
+
+        <label>✂️ Máx Tokens: {{ maxTokens }}</label>
+        <input type="range" [(ngModel)]="maxTokens" min="10" max="4096" step="10">
+
+        <label>🎯 Top-p: {{ topP }}</label>
+        <input type="range" [(ngModel)]="topP" min="0" max="1" step="0.05">
+      </section>
+    </div>
+  </div>
+
+  <div class="button-group">
+    <button
+      class="btn btn-blue"
+      [disabled]="guardando || procesando"
+      (click)="saveLLMConfig()">
+      {{ guardando ? '💾 Guardando...' : '💾 Guardar Configuración' }}
+    </button>
+
+    <button
+      class="btn btn-green"
+      [disabled]="procesando"
+      (click)="processDocument()">
+      {{ procesando ? '⏳ Procesando...' : '📚 Procesar Documentos' }}
+    </button>
+  </div>
+
+</div>
