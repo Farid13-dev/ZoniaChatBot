@@ -1,0 +1,25 @@
+{
+  // Interprete del proyecto: evita que VS Code coja el Python del sistema,
+  // donde no estan instaladas las dependencias.
+  "python.defaultInterpreterPath": "${workspaceFolder}/zoniaenv/Scripts/python.exe",
+  "python.terminal.activateEnvironment": true,
+  "files.exclude": {
+    "**/__pycache__": true,
+    "**/*.pyc": true
+  },
+  // Carpetas pesadas o generadas: fuera del buscador y del vigilante de
+  // archivos. models/ son ~18 GB y bloquearia el indexado.
+  "search.exclude": {
+    "**/node_modules": true,
+    "**/zoniaenv": true,
+    "**/models": true,
+    "**/dist": true,
+    "**/.angular": true
+  },
+  "files.watcherExclude": {
+    "**/node_modules/**": true,
+    "**/zoniaenv/**": true,
+    "**/models/**": true,
+    "**/.angular/**": true
+  }
+}
