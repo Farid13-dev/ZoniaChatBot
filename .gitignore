@@ -81,3 +81,7 @@ __pycache__/
 *.m4a
 *.mp3
 *.onnx
+
+# Corpus de documentos: la carpeta se conserva, los PDF no se versionan
+corpus_emb/*
+!corpus_emb/.gitkeep
