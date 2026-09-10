@@ -1,0 +1,70 @@
+<div #chatModal id="chat-modal" class="modal" [class.hidden]="!isOpen">
+  <!-- Header del chat -->
+  <div class="modal-header">
+    <img loading="lazy" src="assets/Img/logo3.png" class="img"/>
+    <div class="chat-title">
+      <div class="chat-heading">Zonia Chat</div>
+      <div class="chat-subheading">¡Bienvenido a Zonia! 👋</div>
+    </div>
+
+    <div class="icon-container" style="position: relative;">
+      <i class="fas fa-ellipsis-v more-options" (click)="toggleOptionsMenu()"></i>
+      <i class="fas fa-times close" (click)="chatLogic.toggleChat()"></i>
+
+      <div class="options-menu" [ngClass]="{ 'show': isOptionsMenuVisible }">
+        @if (sessionState) {
+          <div class="menu-option" (click)="chatLogic.closeChat(true)">
+            <i class="fas fa-trash-alt"></i> Cerrar sesión
+          </div>
+        }
+        @if (!sessionState) {
+          <div class="menu-option" (click)="iniciar_session()">
+            <i class="fas fa-play-circle"></i> Iniciar nueva sesión
+          </div>
+        }
+      </div>
+    </div>
+  </div>
+
+  <!--    &lt;!&ndash; Info de sesión &ndash;&gt;-->
+  <!--    <div class="text-muted small text-end px-2 pb-1">-->
+  <!--      ⏱️ {{ sessionState?.sessionDuration }}-->
+  <!--      <span *ngIf="sessionState?.inactive">| 💤 {{ sessionState?.inactivityDuration }}</span>-->
+<!--    </div>-->
+
+<!-- Cuerpo del chat -->
+<div class="modal-body">
+  <div #chatDisplay id="chat-display" (scroll)="onChatScroll()">
+
+    <!-- Mensajes (con sugerencias de documentos dentro) -->
+    <app-chat-messages
+      [messages]="messages"
+      [documentoSeleccionado]="!!documentoSeleccionadoId"
+      [documentoSeleccionadoId]="documentoSeleccionadoId"
+      (onSelectDocumento)="seleccionarDocumentoCompleto($event)"
+      [likeAnswer]="likeAnswer.bind(this)"
+      [dislikeAnswer]="dislikeAnswer.bind(this)"
+      [selectSubquestion]="onMensajeUsuario.bind(this)"
+      [volverAVerDocumentos]="volverAVerDocumentos.bind(this)">
+    </app-chat-messages>
+
+
+    <!-- Botón de scroll -->
+    @if (showScrollToBottomButton) {
+      <div class="scroll-to-bottom" (click)="scrollToBottomWithArrow()">
+        &#x25BC;
+      </div>
+    }
+  </div>
+</div>
+
+<!-- Input del usuario -->
+<app-chat-input
+  [isSendActive]="!puedeEnviarMensaje"
+  [isASRActive]="puedeUsarASR"
+  [isOCRActive]="puedeUsarOCR"
+  (messageSent)="onMensajeUsuario($event)">
+</app-chat-input>
+
+
+</div>

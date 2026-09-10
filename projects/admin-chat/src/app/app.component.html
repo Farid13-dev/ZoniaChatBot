@@ -1,0 +1,30 @@
+<div class="admin-container">
+  <h1>📊 Configuración del Chatbot</h1>
+
+  <!-- Pestañas -->
+  <div class="tabs">
+    @for (tab of tabs; track tab; let i = $index) {
+      <button
+        [ngClass]="{ 'active': selectedTab === i }"
+        (click)="selectTab(i)">
+        {{ tab.label }}
+      </button>
+    }
+  </div>
+
+  <!-- Contenido -->
+  <div class="tab-content">
+    @if (selectedTab === 0) {
+      <app-upload-pdf></app-upload-pdf>
+    }
+    @if (selectedTab === 1) {
+      <app-process-docs></app-process-docs>
+    }
+    @if (selectedTab === 2) {
+      <app-initialize-qa></app-initialize-qa>
+    }
+    @if (selectedTab === 3 && renderChatbot) {
+      <app-chatbot></app-chatbot>
+    }
+  </div>
+</div>

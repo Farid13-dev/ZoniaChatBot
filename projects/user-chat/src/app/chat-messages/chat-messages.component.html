@@ -1,0 +1,137 @@
+<div class="message-container">
+  @for (message of messages; track message; let i = $index) {
+    <div class="message-wrapper">
+      <!-- 💬 Burbuja de mensaje -->
+      <div
+      [ngClass]="{
+        'message-left': message.sender === 'user',
+        'message-right': message.sender === 'bot'
+      }"
+        class="message"
+        >
+        <div class="message-text">
+          {{ message.text }}
+          <!-- 📚 Fuentes / Badges con enlace -->
+          @if (message.sources?.length) {
+            @for (fuente of message.sources; track fuente; let idx = $index) {
+              <a
+                class="source-badge"
+                [href]="fuente.url"
+                target="_blank"
+                rel="noopener noreferrer"
+                [attr.data-tooltip]="fuente.documento + ' — pág. ' + fuente.pagina"
+                >
+                {{ idx + 1 }}
+              </a>
+            }
+          }
+        </div>
+        <!-- ⏳ Indicador de escritura -->
+        @if (message.streaming) {
+          <div class="typing-indicator">
+            <span class="dot"></span>
+            <span class="dot"></span>
+            <span class="dot"></span>
+          </div>
+        }
+        <!-- 👍👎📋 Acciones rápidas -->
+        @if (message.sender === 'bot') {
+          <div class="feedback-actions">
+            <!-- Copiar -->
+            <div class="copy-wrapper">
+              @if (message.question_id && message.answer_id) {
+                <i
+                  class="fas fa-copy"
+                  title="Copiar"
+                  [ngClass]="{ copied: copiedStates[i] }"
+                  (click)="copyToClipboard(message.text, i)"
+                ></i>
+              }
+              @if (copiedStates[i]) {
+                <span class="copy-tooltip">Copiado</span>
+              }
+            </div>
+            <!-- Like -->
+            @if (message.question_id && message.answer_id) {
+              <i
+                class="fas fa-thumbs-up"
+                title="Me gustó"
+                [ngClass]="{ liked: message.feedback === 'like' }"
+                (click)="likeAnswer(message.question_id!, message.answer_id!, message)"
+              ></i>
+            }
+            <!-- Dislike -->
+            @if (message.question_id && message.answer_id) {
+              <i
+                class="fas fa-thumbs-down"
+                title="No me gustó"
+                [ngClass]="{ disliked: message.feedback === 'dislike' }"
+                (click)="dislikeAnswer(message.question_id!, message.answer_id!, message)"
+              ></i>
+            }
+          </div>
+        }
+      </div>
+      <!-- 👤 Avatares -->
+      <!--    <div> Iconos diseñados por <a href="https://www.flaticon.es/autores/flat-icons" title="Flat Icons"> Flat Icons </a> from <a href="https://www.flaticon.es/" title="Flaticon">www.flaticon.es'</a></div>-->
+      @if (message.sender === 'user') {
+        <img
+          src="assets/Img/usuario.png"
+          class="profile-icon-left"
+          alt="Avatar usuario"
+          />
+      }
+      @if (message.sender === 'bot') {
+        <img
+          src="assets/Img/heliconia.png"
+          class="profile-icon-right"
+          alt="Avatar bot"
+          />
+      }
+      <!-- 📘 Documentos sugeridos -->
+      @if (message.documentSuggestions && !documentoSeleccionado) {
+        <div
+          class="document-list fade-in"
+          >
+          <div class="document-button-container">
+            @for (categoria of objectKeys(message.documentSuggestions); track categoria) {
+              @for (doc of message.documentSuggestions[categoria]; track doc) {
+                <button
+                  class="document-chip"
+                  [class.selected]="documentoSeleccionadoId === doc.id"
+                  (click)="selectDocumento(doc)"
+                  >
+                  {{ doc.categoria }}
+                </button>
+              }
+            }
+          </div>
+        </div>
+      }
+      <!-- 🧠 Subpreguntas -->
+      @if (message.subquestions?.length || mostrarVolverADocumentos(message)) {
+        <div
+          class="subquestions fade-in mt-3 text-center"
+          >
+          <div class="d-flex flex-wrap justify-content-center gap-2">
+            @for (sub of message.subquestions; track sub) {
+              <button
+                class="chip-button"
+                (click)="selectSubquestion(sub)"
+                >
+                {{ sub }}
+              </button>
+            }
+          </div>
+          @if (mostrarVolverADocumentos(message)) {
+            <div class="fade-in mt-3">
+              <button class="volver-documentos-btn" (click)="volverAVerDocumentos()">
+                ❓ Ver documentos otra vez
+              </button>
+            </div>
+          }
+        </div>
+      }
+    </div>
+  }
+</div>

@@ -1,0 +1,135 @@
+db:
+  vectorstore_name: milvus
+  collection_name: rag_collection
+  insert_batch_size: 2048
+  embedding_dim: 768
+  host: localhost
+  port: '19530'
+  address: null
+  uri: null
+  user: null
+  embedding_field: vector
+  primary_field: document_id
+  text_field: text
+  consistency_level: Strong
+  overwrite: false
+  index_params:
+    metric_type: COSINE
+    index_type: IVF_FLAT
+    params:
+      nlist: 1024
+  search_params:
+    metric_type: COSINE
+    offset: 0
+    ignore_growing: false
+    params:
+      nprobe: 10
+processing:
+  document_id: 1
+splitter:
+  available:
+    splitter_mode: [sentence, token, sentence_window, legal_structure]
+    model_name_tokenizer: [cl100k_base, ../models/BAAI/bge-m3]
+  selected:
+    splitter_mode: sentence
+    model_name_tokenizer: cl100k_base
+    chunk_size: 2000
+    chunk_overlap: 200
+    include_metadata: true
+    include_prev_next_rel: true
+    separator: " "
+    backup_separators: []
+    paragraph_separator: "\n\n\n"
+    secondary_chunking_regex: '[.!?](?!\d)'
+    window_size: 3
+    chunk_sizes: [2048, 1024, 512]
+embedding:
+  provider: sentence-transformers
+  available:
+    openai: [text-embedding-ada-002, text-embedding-3-small, text-embedding-3-large]
+    huggingface: [../models/jinaai/jina-embeddings-v2-base-es, ../models/BAAI/bge-m3]
+    sentence-transformers: [../models/jinaai/jina-embeddings-v2-base-es, ../models/BAAI/bge-m3,
+      ../models/jinaai/jina-embeddings-v3]
+  selected:
+    provider: sentence-transformers
+    model_name: ../models/jinaai/jina-embeddings-v2-base-es
+    tokenizer_name: ../models/jinaai/jina-embeddings-v2-base-es
+    api_key: ''
+    pooling: cls
+    max_length: 2048
+    normalize: true
+    embedding_batch_size: 8
+    device: cuda
+    cache_folder: models/
+    trust_remote_code: true
+    torch_dtype: float16
+    stride: 212
+    sliding_window: true
+rerank:
+  provider: sentence-transformers
+  available:
+    huggingface: [../models/jinaai/jina-reranker-v2-base-multilingual, ../models/BAAI/bge-reranker-v2-m3,
+      BAAI/bge-reranker-base]
+    sentence-transformers: [../models/jinaai/jina-reranker-v2-base-multilingual, ../models/cross-encoder/ms-marco-MiniLM-L6-v2]
+  selected:
+    provider: sentence-transformers
+    model_name: ../models/jinaai/jina-reranker-v2-base-multilingual
+    tokenizer_name: ../models/jinaai/jina-reranker-v2-base-multilingual
+    device: cuda
+    top_n: 3
+    max_length: 1024
+    batch_size: 8
+    token: '10'
+    trust_remote_code: true
+llm:
+  provider: groq
+  available:
+    openai: [gpt-4o-mini, gpt-4o, gpt-3.5-turbo]
+    groq: [openai/gpt-oss-120b, openai/gpt-oss-20b, qwen/qwen3.8-27b, groq/compound]
+    huggingface: [Qwen/Qwen2.5-72B-Instruct, deepseek-ai/DeepSeek-R1-Distill-Qwen-32B,
+      meta-llama/Llama-3.1-8B-Instruct, meta-llama/Llama-3.3-70B-Instruct]
+    local: []
+  selected:
+    provider: groq
+    model_name: qwen/qwen3.8-27b
+    tokenizer_name: qwen/qwen3.8-27b
+    api_key: ${oc.env:GROQ_API_KEY,""}
+    api_base: https://api.groq.com/openai/v1
+    context_window: 32768
+    max_tokens: 512
+    temperature: 0.6
+    top_p: 0.9
+    top_k: 10
+    num_beams: 3
+    do_sample: null
+    use_cache: true
+    device_map: null
+    torch_dtype: float32
+    device: cuda
+retriever:
+  retriever_mode: bm25
+  hybrid_mode: or
+  similarity_top_k: 10
+  use_async: false
+  show_progress: false
+  vector_store_query_mode: default
+  sparse_top_k: 10
+  alpha: null
+  list_query_mode: default
+  choice_batch_size: 10
+response_config:
+  verbose: false
+  response_mode: simple_summarize
+  use_async: true
+  streaming: true
+show_progress: false
+input_dir: data/
+only_suffixs: .pdf
+recursive: true
+num_files_limit: 10
+defaults:
+  - retriever: sparse
+  - splitter: sentence
+question_gen:
+  max_subquestions: 3
+  subquestion_status: true

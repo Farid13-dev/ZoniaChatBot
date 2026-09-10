@@ -1,0 +1,220 @@
+/* 📌 Encabezados */
+h2, h3, h4 {
+  text-align: center;
+  color: #2E7D32;
+  margin-bottom: 16px;
+  font-weight: 600;
+  border-bottom: 1px solid #ddd;
+  padding-bottom: 6px;
+}
+
+/* 📐 Layout flexible y responsivo */
+.grid-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 24px;
+  margin-top: 20px;
+}
+
+/* 📂 Secciones */
+.config-section {
+  background: #ffffff;
+  padding: 24px;
+  border-radius: 12px;
+  box-shadow: 0 3px 12px rgba(0, 0, 0, 0.08);
+  transition: transform 0.2s;
+}
+
+.config-section:hover {
+  transform: translateY(-2px);
+}
+
+/* 🧩 Botones agrupados */
+.buttons {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 16px;
+}
+
+button {
+  border: none;
+  padding: 10px 16px;
+  border-radius: 6px;
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* 🎨 Botón colores */
+.btn-green {
+  background-color: #2ecc71;
+  color: white;
+}
+
+.btn-green:hover {
+  background-color: #27ae60;
+}
+
+.btn-red {
+  background-color: #e74c3c;
+  color: white;
+}
+
+.btn-red:hover {
+  background-color: #c0392b;
+}
+
+.btn-orange {
+  background-color: #f39c12;
+  color: white;
+}
+
+.btn-orange:hover {
+  background-color: #d68910;
+}
+
+.btn-blue {
+  background-color: #3498db;
+  color: white;
+}
+
+.btn-blue:hover {
+  background-color: #2c80b4;
+}
+
+/* 🚫 Botones desactivados */
+button:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+}
+
+/* 📝 Inputs y selects */
+input, select {
+  width: 100%;
+  padding: 10px;
+  margin: 10px 0;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 15px;
+  transition: border 0.2s;
+}
+
+input:focus, select:focus {
+  border-color: #2E7D32;
+  outline: none;
+}
+
+/* 📃 Listas */
+ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+ul li {
+  background: #f9f9f9;
+  padding: 12px 16px;
+  border-radius: 8px;
+  margin-bottom: 8px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* 🧾 Metadatos */
+.category {
+  font-style: italic;
+  color: #555;
+}
+
+.doc-id {
+  font-size: 13px;
+  color: #777;
+  margin-top: 4px;
+}
+
+/* 💬 Modal backdrop */
+.modal-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 999;
+}
+
+/* 💬 Modal contenido */
+.modal-content {
+  background: #ffffff;
+  padding: 30px;
+  width: 600px;
+  max-width: 95%;
+  border-radius: 12px;
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.25);
+}
+
+.modal-content input {
+  margin: 10px 0;
+  font-size: 16px;
+}
+
+.modal-buttons {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+/* 📘 Lista Milvus */
+.milvus-list {
+  padding: 0;
+  margin-top: 10px;
+}
+
+.milvus-item {
+  background: #f1f3f5;
+  padding: 12px 16px;
+  border-radius: 8px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+  transition: background 0.2s ease-in-out;
+}
+
+.milvus-item:hover {
+  background: #eaecee;
+}
+
+.milvus-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.milvus-info strong {
+  color: #333;
+  font-size: 15px;
+}
+
+/* 📱 Responsividad extra */
+@media (max-width: 768px) {
+  .modal-content {
+    padding: 20px;
+  }
+
+  .buttons {
+    flex-direction: column;
+    gap: 8px;
+  }
+}
