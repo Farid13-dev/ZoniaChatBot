@@ -42,8 +42,12 @@ Nada de eso es decoración: el corpus son **dos estatutos con estructura casi id
 de artículo aparecen en los dos— y un RAG de manual falla ahí de forma sistemática. Ver
 [El desafío del corpus](#el-desafío-del-corpus).
 
-> **Estado del proyecto.** Prototipo funcional y evaluado, no un producto en producción.
-> Ver [Limitaciones conocidas](#limitaciones-conocidas).
+> **Estado del proyecto.** Prototipo de trabajo de grado: funcional y evaluado con usuarios, pero
+> no endurecido para producción. No tiene memoria conversacional y su filtro de intención rechaza
+> más de la cuenta — las dos cosas están explicadas, con su causa, en
+> [Limitaciones conocidas](#limitaciones-conocidas). Se construyó y se midió en un portátil con
+> 4 GB de VRAM, lo que condicionó buena parte del diseño: ver
+> [Entorno de desarrollo](#entorno-de-desarrollo).
 
 ---
 
@@ -80,10 +84,11 @@ de artículo aparecen en los dos— y un RAG de manual falla ahí de forma siste
 **Contexto**
 
 17. [Evolución del stack](#evolución-del-stack) — de OpenAI a Groq, y por qué
-18. [Limitaciones conocidas](#limitaciones-conocidas)
-19. [Roadmap](#roadmap)
-20. [Créditos](#créditos)
-21. [Licencia](#licencia)
+18. [Entorno de desarrollo](#entorno-de-desarrollo) — el hardware y su efecto en el diseño
+19. [Limitaciones conocidas](#limitaciones-conocidas) — qué no hace y por qué
+20. [Roadmap](#roadmap)
+21. [Créditos](#créditos)
+22. [Licencia](#licencia)
 
 </details>
 
@@ -263,9 +268,9 @@ Módulos propios más relevantes:
 | `rag/node_parser/relationship/legal_structure.py` | Splitter jerárquico para documentos normativos |
 | `rag/vector_stores/milvus.py` | Vector store con búsqueda sparse y filtrado por documento |
 | `rag/retrievers/hybrid_retriever.py` | Fusión de resultados denso + léxico |
-| `rag/memory/chat_summary_memory_buffer.py` | Memoria conversacional con resumen por límite de tokens |
 | `rag/engine/subquestion_engine.py` | Descomposición en subpreguntas |
-| `rag/storage/chat_store/sqlite.py` | Persistencia del historial |
+| `rag/memory/chat_summary_memory_buffer.py` | Memoria conversacional — **implementado pero no cableado**, ver [Limitaciones](#limitaciones-conocidas) |
+| `rag/storage/chat_store/sqlite.py` | Persistencia del historial — **implementado pero no cableado** |
 
 ---
 
@@ -893,49 +898,149 @@ La configuración de OpenAI **sigue cableada** en `config_process.yaml` (`llm.av
 
 ---
 
+## Entorno de desarrollo
+
+El prototipo se construyó y se midió **en un portátil**, no en un servidor. Esa restricción no es
+un detalle de contexto: determinó buena parte de las decisiones de arquitectura.
+
+| | |
+|---|---|
+| CPU | AMD Ryzen 5 3550H (4 núcleos / 8 hilos, 2,1 GHz) |
+| RAM | 24 GB |
+| GPU | NVIDIA GeForce GTX 1650 — **4 GB de VRAM** (Turing, sm_75) |
+| Sistema | Windows 11, 64 bits |
+
+**Qué se ejecuta en local:** embeddings (`jina-embeddings-v2-base-es`, fp16), reranker
+(`jina-reranker-v2`, 278M), ASR (`whisper-small-es`), OCR y TTS. Todo eso comparte los mismos 4 GB.
+
+**Qué no cabe:** un LLM generador. Por eso el modelo de lenguaje es remoto —primero la API de
+OpenAI, hoy Groq— y no una decisión de comodidad. Durante la selección se probaron BERT, RoBERTa,
+Mistral, T5 y Flan-T5 en local, y se descartaron por esta misma razón: el hardware disponible no
+daba para servirlos con latencia aceptable.
+
+Esto marca una diferencia honesta frente a un sistema con presupuesto de infraestructura. Con más
+VRAM se podrían servir modelos locales —eliminando la dependencia de un tercero y el envío del
+prompt fuera de la máquina—, usar embeddings más grandes, subir `top_n` sin penalizar la latencia,
+y ejecutar el OCR en GPU. Las cifras de rendimiento de este README hay que leerlas contra este
+hardware.
+
+---
+
 ## Limitaciones conocidas
 
-Las dos primeras son **consecuencia directa de la actualización a Python 3.12 y CUDA 13.2**, no
-defectos de diseño: funcionaban en el entorno original (Python 3.11, CUDA 12.x).
+Prototipo de trabajo de grado, evaluado pero no endurecido. Estas son las limitaciones reales,
+empezando por las que afectan a **cómo responde**, que son las que importan si vas a usarlo.
+
+### Comportamiento de las respuestas
+
+- **No hay memoria conversacional.** Cada pregunta se resuelve de forma independiente: el pipeline
+  recibe la consulta actual y nada más. Un seguimiento natural como *"¿y en posgrado?"* o *"¿desde
+  cuándo aplica eso?"* no funciona, porque el sistema no sabe a qué se refiere «eso». El módulo
+  `rag/memory/chat_summary_memory_buffer.py` está implementado (341 líneas) pero **ningún componente
+  lo importa**; lo mismo con `rag/storage/chat_store/sqlite.py`. Es la limitación con más impacto en
+  la experiencia y la primera que habría que cerrar.
+
+- **El clasificador de intención rechaza de más.** Antes de recuperar nada, un prompt clasifica la
+  pregunta en `positivo` / `neutro` / `negativo`, y solo `positivo` continúa. La taxonomía es una
+  lista de temas escrita a mano (*requisitos de inscripción, matrícula, régimen disciplinario…*),
+  así que una pregunta legítima formulada fuera de ese vocabulario se responde con *"No puedo
+  responder a eso"* aunque la respuesta esté en el documento indexado. Dos agravantes:
+  - El bloque `except` devuelve `("negativo", …)`. **Cualquier fallo** —que el modelo no devuelva
+    JSON válido, un timeout, una salida con formato inesperado— se convierte en un rechazo
+    indistinguible de un rechazo legítimo. Con modelos pequeños, que el JSON salga mal no es raro.
+  - El propio prompt tiene defectos de redacción: dice *"clasificar la pregunta en negativo o
+    positivo"* y luego pide tres etiquetas, la numeración de los negativos salta el 3, y arrastra
+    comillas y `
+` literales de una concatenación anterior. Está en
+    `rag/constants/default_prompt.py` (`USER_PROMT_ITENT_TREE`).
+
+  El resultado es un asistente **más restrictivo de lo que pretendía su diseño**. Un umbral de
+  confianza, o dejar pasar la consulta cuando la clasificación falla en vez de rechazarla, cambiaría
+  bastante el comportamiento.
+
+- **Dos llamadas al LLM antes de buscar.** Cada pregunta paga clasificación de intención +
+  reformulación antes de que empiece la recuperación. Ahorra tokens en saludos, pero añade dos
+  viajes de red al camino crítico de toda consulta legítima.
+
+- **El contexto que llega al modelo es estrecho.** Con `top_n: 2` solo dos fragmentos entran en el
+  prompt, y `max_tokens: 512` limita la respuesta. Funciona bien para *"¿qué dice el artículo 47?"*;
+  se queda corto en preguntas que abarcan varios artículos o capítulos, donde la respuesta puede
+  salir incompleta o truncada. Es un compromiso deliberado con el hardware descrito arriba.
+
+- **Una conversación, un documento.** El alcance por `document_id` elimina la ambigüedad entre
+  estatutos, pero impide preguntas comparativas en un solo turno. Ver
+  [Aislamiento por documento](#aislamiento-por-documento-la-solución-a-la-ambigüedad).
+
+- **Síntesis en una sola pasada.** `response_mode: simple_summarize` no reintenta ni refina sobre
+  varios bloques. Con pocos fragmentos es suficiente; no escala a contextos largos.
+
+- **La evaluación mide percepción, no recuperación.** El 87,72 % es similitud percibida por
+  personas sobre 20 consultas. No hay hit-rate, MRR ni nDCG del retriever, así que **no está medido
+  cuántas veces el fragmento correcto ni siquiera llega al reranker**. Sin eso, afinar la
+  recuperación es a ciegas.
+
+### Defectos conocidos
+
+- **`POST /end_session` no elimina la sesión.** Responde `{"status": "deleted"}` y el mensaje
+  *"finalizada y eliminada correctamente"*, pero no ejecuta ningún borrado: solo consulta la fila.
+  La sesión sigue en SQLite hasta que expira por inactividad.
+
+- **El token de administración viaja en el bundle del frontend**
+  (`projects/*/src/environments/environment.ts`). Cualquiera que abra el sitio puede leerlo. El
+  repositorio no trae ningún valor por defecto —`adminToken` viene vacío y `ADMIN_TOKEN` sin definir
+  deja los endpoints de administración devolviendo `403`—, pero el mecanismo sigue siendo el de un
+  prototipo: **no usar tal cual en producción**, debe sustituirse por autenticación real en el
+  servidor.
+
+### Alcance y operación
+
+- **Concurrencia de prototipo.** Diseñado y medido para 1 administrador + 1 usuario simultáneos en
+  red local. No hay pruebas de carga, ni el aislamiento de sesiones que exigiría un despliegue
+  multiusuario.
+
+- **Ingesta manual y completa.** Añadir o actualizar un documento pasa por la consola y reindexa;
+  no hay detección de cambios ni ingesta incremental.
+
+- **OCR en CPU.** `easyocr.Reader` se instancia con `gpu=False` por estabilidad y por la VRAM
+  disponible; es el paso más lento de la ruta multimodal (timeout de 20 s → HTTP 408).
+
+### Consecuencias de la actualización del stack
+
+Estas dos funcionaban en el entorno original (Python 3.11, CUDA 12.x) y se perdieron al modernizar:
 
 - **DeepFilterNet2 (reducción de ruido previa al ASR) está deshabilitado.** `deepfilterlib` solo
   publica wheels hasta `cp311`. El ASR funciona sin esa etapa, con más sensibilidad al ruido
   ambiental. Ver `qa_docs/asr/asr_whisper.py`.
-- **`torchaudio` no existe para CUDA 13.2** (se quedó en la 2.11). Se sustituyó por `soundfile` +
-  `scipy.signal.resample_poly` para la carga y el resampleo de audio.
+- **`torchaudio` no existe para CUDA 13.2** (se quedó en la 2.11). Sustituido por `soundfile` +
+  `scipy.signal.resample_poly`.
 - **Pines que no se deben subir.** `transformers` está fijado en **4.57.6**: el código remoto de
-  `jina-reranker-v2` importa `create_position_ids_from_input_ids`, que `transformers` 5 eliminó.
-  Por lo mismo, `sentence-transformers` no puede pasar de **5.1.2**. Cambiar de reranker no es
+  `jina-reranker-v2` importa `create_position_ids_from_input_ids`, que `transformers` 5 eliminó. Por
+  lo mismo, `sentence-transformers` no puede pasar de **5.1.2**. Cambiar de reranker no es
   alternativa: `ms-marco-MiniLM` es solo inglés y el corpus es español.
-- **El token de administrador viaja en el bundle del frontend**
-  (`projects/*/src/environments/environment.ts`). Cualquiera que abra el sitio puede leerlo. El
-  repositorio no trae ningún valor por defecto —`adminToken` viene vacío y `ADMIN_TOKEN` sin
-  definir deja los endpoints de administración devolviendo `403`—, pero el mecanismo sigue siendo
-  el de un prototipo: **no usar tal cual en producción**, debe sustituirse por autenticación real
-  en el servidor.
-- **Concurrencia de prototipo.** El sistema se diseñó y midió para 1 administrador + 1 usuario
-  simultáneos en red local. No hay pruebas de carga.
-- **OCR en CPU.** `easyocr.Reader` se instancia con `gpu=False` por estabilidad; es el paso más
-  lento de la ruta multimodal (timeout de 20 s → HTTP 408).
-- **Sin evaluación automatizada de recuperación.** El 87,72 % mide similitud percibida por
-  personas, no hit-rate ni MRR del retriever. Está en el roadmap.
 
 ---
 
 ## Roadmap
 
-- [ ] Sacar el token de administración del bundle y montar autenticación en servidor.
-- [ ] Suite de evaluación automatizada (preguntas doradas + hit-rate / MRR / nDCG) para dejar de
-      afinar el retriever a ciego.
-- [ ] Reactivar la reducción de ruido del ASR cuando haya wheels de `deepfilterlib` para cp312, o
-      sustituirla por una alternativa mantenida.
-- [ ] Pipeline de ingesta incremental: detectar PDFs nuevos o modificados sin reindexar todo.
-- [ ] Caché de embeddings de consulta y pruebas de carga.
-- [ ] **Activar `legal_structure` como splitter por defecto.** Está implementado pero el YAML sigue
-      usando `sentence`; es la pieza pensada específicamente para el problema del corpus y falta
-      medirla contra la actual antes de promoverla.
-- [ ] Inferir el `document_id` de la propia pregunta ("en posgrado, ¿qué dice el artículo 45?")
-      para complementar la selección manual, y permitir consultas comparativas entre estatutos.
+Ordenado por impacto sobre la calidad de las respuestas, no por dificultad.
+
+1. **Cablear la memoria conversacional.** El módulo existe; falta pasarle el historial de la sesión
+   al pipeline para que los seguimientos funcionen. Es lo que más cambiaría la experiencia.
+2. **Suavizar el clasificador de intención.** Dejar pasar la consulta cuando la clasificación falla
+   en vez de rechazarla, corregir el prompt y sustituir la lista de temas por un umbral de
+   confianza.
+3. **Suite de evaluación automatizada** (preguntas doradas + hit-rate / MRR / nDCG) para medir la
+   recuperación y dejar de afinarla a ciegas.
+4. **Activar `legal_structure` como splitter por defecto**, midiéndolo antes contra `sentence`. Es
+   la pieza pensada para el problema del corpus y hoy no está en uso.
+5. **Arreglar `POST /end_session`** para que elimine la sesión que dice eliminar.
+6. **Sacar el token de administración del bundle** y montar autenticación en servidor.
+7. **Inferir el `document_id` de la propia pregunta** ("en posgrado, ¿qué dice el artículo 45?")
+   para complementar la selección manual y permitir consultas comparativas.
+8. **Ingesta incremental**: detectar PDF nuevos o modificados sin reindexar todo.
+9. **Reactivar la reducción de ruido del ASR** cuando haya wheels de `deepfilterlib` para cp312, o
+   sustituirla por una alternativa mantenida.
+10. **Caché de embeddings de consulta y pruebas de carga.**
 
 ---
 
