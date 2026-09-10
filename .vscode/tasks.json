@@ -1,26 +1,41 @@
 {
-  // For more information, visit: https://go.microsoft.com/fwlink/?LinkId=733558
   "version": "2.0.0",
   "tasks": [
     {
+      // Puerto 4202 obligatorio: es uno de los dos origenes que el backend
+      // permite por CORS (Rag_Milvus/qa_docs/__init__.py). En el 4200 la
+      // interfaz carga pero toda llamada al servidor falla.
+      "label": "ng serve user-chat (4202)",
       "type": "npm",
-      "script": "start",
+      "script": "start:user",
       "isBackground": true,
       "problemMatcher": {
         "owner": "typescript",
         "pattern": "$tsc",
         "background": {
           "activeOnStart": true,
-          "beginsPattern": {
-            "regexp": "(.*?)"
-          },
-          "endsPattern": {
-            "regexp": "bundle generation complete"
-          }
+          "beginsPattern": { "regexp": "(.*?)" },
+          "endsPattern": { "regexp": "bundle generation complete" }
         }
       }
     },
     {
+      "label": "ng serve admin-chat (4203)",
+      "type": "npm",
+      "script": "start:admin",
+      "isBackground": true,
+      "problemMatcher": {
+        "owner": "typescript",
+        "pattern": "$tsc",
+        "background": {
+          "activeOnStart": true,
+          "beginsPattern": { "regexp": "(.*?)" },
+          "endsPattern": { "regexp": "bundle generation complete" }
+        }
+      }
+    },
+    {
+      "label": "ng test",
       "type": "npm",
       "script": "test",
       "isBackground": true,
@@ -29,14 +44,23 @@
         "pattern": "$tsc",
         "background": {
           "activeOnStart": true,
-          "beginsPattern": {
-            "regexp": "(.*?)"
-          },
-          "endsPattern": {
-            "regexp": "bundle generation complete"
-          }
+          "beginsPattern": { "regexp": "(.*?)" },
+          "endsPattern": { "regexp": "bundle generation complete" }
         }
       }
+    },
+    {
+      // El backend no arranca sin Milvus: falla al construir el pipeline.
+      "label": "Milvus + Attu (docker)",
+      "type": "shell",
+      "command": "docker compose -f docker-compose.milvus.yml up -d",
+      "problemMatcher": []
+    },
+    {
+      "label": "Milvus: parar",
+      "type": "shell",
+      "command": "docker compose -f docker-compose.milvus.yml stop",
+      "problemMatcher": []
     }
   ]
 }

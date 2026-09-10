@@ -1,20 +1,83 @@
 {
-  // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
   "version": "0.2.0",
   "configurations": [
     {
-      "name": "ng serve",
+      // Antes apuntaba al 4200, donde el CORS del backend rechaza todo.
+      "name": "Front: user-chat (4202)",
       "type": "chrome",
       "request": "launch",
-      "preLaunchTask": "npm: start",
-      "url": "http://localhost:4200/"
+      "preLaunchTask": "ng serve user-chat (4202)",
+      "url": "http://localhost:4202/",
+      "webRoot": "${workspaceFolder}/projects/user-chat"
     },
     {
-      "name": "ng test",
+      "name": "Front: admin-chat (4203)",
       "type": "chrome",
       "request": "launch",
-      "preLaunchTask": "npm: test",
-      "url": "http://localhost:9876/debug.html"
+      "preLaunchTask": "ng serve admin-chat (4203)",
+      "url": "http://localhost:4203/",
+      "webRoot": "${workspaceFolder}/projects/admin-chat"
+    },
+    {
+      // Sin --reload: el recargador de uvicorn lanza un subproceso y el
+      // depurador se queda enganchado al padre, sin parar en los breakpoints.
+      "name": "Backend: RAG + chat (8000)",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "uvicorn",
+      "args": ["qa_docs:app", "--host", "127.0.0.1", "--port", "8000"],
+      "cwd": "${workspaceFolder}/Rag_Milvus",
+      "envFile": "${workspaceFolder}/.env",
+      "console": "integratedTerminal",
+      "justMyCode": false
+    },
+    {
+      // Se lanza desde su propia carpeta porque asr_whisper.py resuelve
+      // rutas con Path(__file__), no con el directorio de trabajo.
+      "name": "Backend: ASR Whisper (8001)",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "uvicorn",
+      "args": ["asr_whisper:app", "--host", "127.0.0.1", "--port", "8001"],
+      "cwd": "${workspaceFolder}/Rag_Milvus/qa_docs/asr",
+      "envFile": "${workspaceFolder}/.env",
+      "console": "integratedTerminal",
+      "justMyCode": false
+    },
+    {
+      "name": "Backend: OCR EasyOCR (8002)",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "uvicorn",
+      "args": ["ocr_easy:app", "--host", "127.0.0.1", "--port", "8002"],
+      "cwd": "${workspaceFolder}/Rag_Milvus/qa_docs/ocr",
+      "envFile": "${workspaceFolder}/.env",
+      "console": "integratedTerminal",
+      "justMyCode": false
+    },
+    {
+      "name": "Python: archivo actual",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${file}",
+      "envFile": "${workspaceFolder}/.env",
+      "console": "integratedTerminal",
+      "justMyCode": false
+    }
+  ],
+  "compounds": [
+    {
+      // Levanta Milvus antes: el backend no arranca sin el.
+      "name": "Todo: backend + user-chat",
+      "configurations": ["Backend: RAG + chat (8000)", "Front: user-chat (4202)"],
+      "preLaunchTask": "Milvus + Attu (docker)",
+      "stopAll": true
+    },
+    {
+      "name": "Todo: backend + admin-chat",
+      "configurations": ["Backend: RAG + chat (8000)", "Front: admin-chat (4203)"],
+      "preLaunchTask": "Milvus + Attu (docker)",
+      "stopAll": true
     }
   ]
 }
