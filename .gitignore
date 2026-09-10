@@ -40,3 +40,44 @@ testem.log
 # System files
 .DS_Store
 Thumbs.db
+
+# ── Añadido en la puesta al día ────────────────────────────────────────
+# Entornos virtuales: zoniaenv llego a estar commiteado (37.198 archivos)
+zoniaenv/
+.venv/
+venv/
+env/
+
+# Modelos descargados de HuggingFace (~18 GB) y voces de Piper
+models/
+voices/
+Rag_Milvus/voices/
+
+# Cache de Angular (antes solo se ignoraba /.angular/cache)
+/.angular/
+
+# Estado local: bases de datos, subidas y salidas generadas
+*.db
+*.sqlite3
+session/
+uploads/
+salida/
+Rag_Milvus/session/
+Rag_Milvus/uploads/
+
+# Secretos
+.env
+.env.*
+!.env.example
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+
+# Audio y binarios pesados
+*.wav
+*.m4a
+*.mp3
+*.onnx

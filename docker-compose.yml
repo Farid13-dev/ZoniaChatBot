@@ -1,0 +1,119 @@
+# ZoniaChatBot - servicios de aplicacion (backend + frontends).
+#
+# Milvus vive en docker-compose.milvus.yml. Levanta AMBOS a la vez para que
+# compartan red y los contenedores se vean por nombre de servicio:
+#
+#   docker compose -f docker-compose.milvus.yml -f docker-compose.yml up -d
+#   docker compose -f docker-compose.milvus.yml -f docker-compose.yml ps
+#   docker compose -f docker-compose.milvus.yml -f docker-compose.yml down
+#
+# GPU: los servicios web/asr/ocr piden GPU. Si no tienes el runtime NVIDIA
+# configurado en Docker Desktop, borra el bloque `deploy:` de esos tres
+# servicios y correran en CPU.
+
+services:
+  # ── Backend RAG + chat WebSocket + TTS ──────────────────────────────
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: zonia_web
+    ports:
+      - "8000:8000"
+    working_dir: /app/Rag_Milvus
+    command: ["uvicorn", "qa_docs:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
+    environment:
+      MILVUS_HOST: standalone          # nombre del servicio, NO localhost
+      MILVUS_PORT: "19530"
+    volumes:
+      - ./Rag_Milvus:/app/Rag_Milvus   # hot-reload del codigo
+      - ./rag:/app/rag
+      - ./models:/app/models:ro        # 18 GB: montados, nunca copiados
+      - ./corpus_emb:/app/corpus_emb
+    depends_on:
+      standalone:
+        condition: service_healthy
+    restart: unless-stopped
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+
+  # ── ASR (Whisper) ───────────────────────────────────────────────────
+  asr:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: zonia_asr
+    ports:
+      - "8001:8001"
+    working_dir: /app/Rag_Milvus/qa_docs/asr
+    command: ["uvicorn", "asr_whisper:app", "--host", "0.0.0.0", "--port", "8001"]
+    volumes:
+      - ./Rag_Milvus:/app/Rag_Milvus
+      - ./rag:/app/rag
+      - ./models:/app/models:ro
+    restart: unless-stopped
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+
+  # ── OCR (EasyOCR) ───────────────────────────────────────────────────
+  ocr:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: zonia_ocr
+    ports:
+      - "8002:8002"
+    working_dir: /app/Rag_Milvus/qa_docs/ocr
+    command: ["uvicorn", "ocr_easy:app", "--host", "0.0.0.0", "--port", "8002"]
+    volumes:
+      - ./Rag_Milvus:/app/Rag_Milvus
+      - ./rag:/app/rag
+      - ./models:/app/models:ro
+    restart: unless-stopped
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+
+  # ── Frontend usuario ────────────────────────────────────────────────
+  # Puerto 4202 obligatorio: es el que el backend permite por CORS
+  # (Rag_Milvus/qa_docs/__init__.py). En 4200 fallarian todas las llamadas.
+  user-chat:
+    build:
+      context: .
+      dockerfile: Dockerfile.angular
+    container_name: zonia_user_chat
+    ports:
+      - "4202:4200"
+    command: ["npx", "ng", "serve", "user-chat", "--host", "0.0.0.0", "--port", "4200"]
+    volumes:
+      - ./projects:/app/projects
+      - ./angular.json:/app/angular.json:ro
+    restart: unless-stopped
+
+  # ── Frontend administrador ──────────────────────────────────────────
+  admin-chat:
+    build:
+      context: .
+      dockerfile: Dockerfile.angular
+    container_name: zonia_admin_chat
+    ports:
+      - "4203:4200"
+    command: ["npx", "ng", "serve", "admin-chat", "--host", "0.0.0.0", "--port", "4200"]
+    volumes:
+      - ./projects:/app/projects
+      - ./angular.json:/app/angular.json:ro
+    restart: unless-stopped

@@ -1,0 +1,19 @@
+# ZoniaChatBot - frontends Angular 22 (user-chat y admin-chat)
+# Angular 22 requiere Node ^22.22.3 || ^24.15.0 || >=26
+FROM node:24-slim
+
+WORKDIR /app
+
+# package.json primero: si no cambia, npm ci sale de cache
+COPY package.json package-lock.json ./
+RUN npm ci
+
+# El codigo se monta como volumen en desarrollo (ver docker-compose.yml),
+# esta copia sirve para que la imagen funcione tambien sin montaje.
+COPY angular.json tsconfig*.json ./
+COPY projects ./projects
+
+EXPOSE 4200
+
+# El compose define que proyecto sirve cada contenedor
+CMD ["npx", "ng", "serve", "--host", "0.0.0.0"]

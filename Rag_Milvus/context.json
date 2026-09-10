@@ -1,0 +1,16 @@
+{
+    "chat_items": [],
+    "waiting": false,
+    "time_intervals": {},
+    "collection_exists": true,
+    "sources_to_add": [
+        "estatuto_estudiantil.pdf",
+        "estatuto_estudiantil.pdf",
+        "estatuto_estudiantil.pdf",
+        "estatuto_estudiantil.pdf"
+    ],
+    "sources": [],
+    "processing_sources": false,
+    "tts_active": true,
+    "subq_active": false
+}

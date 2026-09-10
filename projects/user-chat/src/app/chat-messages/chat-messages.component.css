@@ -1,0 +1,487 @@
+/* =========================================
+   📦 CONTENEDORES GENERALES - Responsive
+========================================= */
+
+.message-container {
+  display: flex;
+  flex-direction: column;
+  padding: 16px;
+  gap: 20px;
+  max-width: 100%;
+  box-sizing: border-box;
+  align-items: center; /* Centrado para estética */
+}
+
+.message-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  position: relative;
+  width: 100%;
+  max-width: 900px;
+  box-sizing: border-box;
+
+  /* Espacio adaptable que evita colisión con el avatar */
+  padding-left: clamp(24px, 6vw, 40px);
+  padding-right: clamp(24px, 6vw, 40px);
+}
+
+/* Pantallas grandes */
+@media (min-width: 1200px) {
+  .message-wrapper {
+    max-width: 1000px;
+  }
+}
+
+
+/* Tablets */
+@media (max-width: 768px) {
+  .message-wrapper {
+    padding: 0 16px;
+  }
+}
+
+/* Móviles pequeños */
+@media (max-width: 400px) {
+  .message-wrapper {
+    padding: 0 12px;
+  }
+}
+
+
+/* =========================================
+   💬 BURBUJAS DE MENSAJE - Responsivas
+========================================= */
+
+.message {
+  background-color: #eafaf1;
+  color: #1e1e1e;
+  border-radius: 14px;
+  padding: 14px 18px;
+  width: 100%;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+  font-family: 'Inter', 'Segoe UI', sans-serif;
+  font-size: clamp(14px, 2vw, 16px); /* tipografía adaptable */
+  line-height: 1.5;
+  position: relative;
+  margin-bottom: 12px;
+  white-space: pre-line;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  word-break: break-word;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.message-left {
+  background-color: #f5f7fa;
+  color: #2a2a2a;
+  align-self: flex-start;
+  margin-left: 0;
+}
+
+.message-right {
+  background-color: #d1f2eb;
+  color: #2a2a2a;
+  align-self: flex-end;
+  margin-right: 0;
+}
+
+.message:hover {
+  transform: scale(1.02);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+}
+
+
+/* =========================================
+   👇 COLAS DE MENSAJES - Adaptadas
+========================================= */
+
+.message-left::after,
+.message-right::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 0;
+  height: 0;
+  border: 10px solid transparent;
+}
+
+.message-left::after {
+  left: -8px;
+  border-right-color: #f5f7fa;
+  border-left: 0;
+}
+
+.message-right::after {
+  right: -8px;
+  border-left-color: #d1f2eb;
+  border-right: 0;
+}
+
+/* Móviles: colas más pequeñas */
+@media (max-width: 500px) {
+  .message-left::after,
+  .message-right::after {
+    border-width: 8px;
+  }
+
+  .message-left::after {
+    left: -6px;
+  }
+
+  .message-right::after {
+    right: -6px;
+  }
+}
+
+
+/* =========================================
+   🧑‍🎤 AVATARES / ICONOS DE PERFIL
+========================================= */
+
+.profile-icon-left,
+.profile-icon-right {
+  position: absolute;
+  top: 12px;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #fff;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  z-index: 2;
+}
+
+.profile-icon-left {
+  left: -15px;
+}
+
+.profile-icon-right {
+  right: -15px;
+}
+
+.profile-icon-left:hover,
+.profile-icon-right:hover {
+  transform: scale(1.06);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+}
+
+/* Móviles: avatares más compactos */
+@media (max-width: 500px) {
+  .profile-icon-left,
+  .profile-icon-right {
+    width: 32px;
+    height: 32px;
+    top: 8px;
+  }
+
+  .profile-icon-left {
+    left: -12px;
+  }
+
+  .profile-icon-right {
+    right: -12px;
+  }
+}
+
+
+/* =========================================
+   ⏳ INDICADOR DE TYPING (d responsive)
+========================================= */
+
+.typing-indicator {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 6px;
+  width: fit-content;
+  margin: auto;
+  height: 20px;
+}
+
+.typing-indicator .dot {
+  width: 10px;
+  height: 10px;
+  background-color: #ec7063;
+  border-radius: 50%;
+  animation: bounce 1.5s infinite ease-in-out;
+}
+
+.typing-indicator .dot:nth-child(1) {
+  animation-delay: 0s;
+}
+
+.typing-indicator .dot:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+.typing-indicator .dot:nth-child(3) {
+  animation-delay: 0.4s;
+}
+
+@keyframes bounce {
+  0%, 20%, 100% {
+    transform: scale(0.85);
+  }
+  50% {
+    transform: scale(1.25);
+  }
+}
+
+
+/* =========================================
+   📚 FUENTES COMO BADGES NUMERADAS
+========================================= */
+
+.sources-inline {
+  display: flex;
+  gap: 6px;
+  margin-top: 10px;
+  flex-wrap: wrap;
+}
+
+.source-badge {
+  background-color: rgba(236, 112, 99, 0.15);
+  color: rgba(236, 112, 99, 0.9);
+  border-radius: 10px;
+  padding: 4px 10px;
+  font-weight: 600;
+  font-size: clamp(12px, 1.5vw, 14px);
+  cursor: pointer;
+  position: relative;
+  transition: background-color 0.2s ease;
+  white-space: nowrap;
+}
+
+.source-badge:hover {
+  background-color: rgba(236, 112, 99, 0.25);
+}
+
+.source-badge::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  bottom: 120%;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #fff;
+  color: #333;
+  padding: 6px 10px;
+  border-radius: 6px;
+  font-size: 13px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease;
+  z-index: 1000;
+}
+
+.source-badge:hover::after {
+  opacity: 1;
+}
+
+
+/* =========================================
+   📘 DOCUMENTOS SUGERIDOS
+========================================= */
+
+.document-button-container {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  padding: 10px 0;
+}
+
+.document-chip {
+  background: linear-gradient(135deg, #27ae60, #a3d9c9);
+  color: #0f0f11;
+  padding: 10px 20px;
+  border-radius: 24px;
+  font-size: clamp(14px, 1.7vw, 16px);
+  font-weight: 600;
+  font-family: 'Inter', 'Segoe UI', sans-serif;
+  letter-spacing: 0.3px;
+  cursor: pointer;
+  transition: background-color 0.25s ease, transform 0.2s ease;
+  border: none;
+  box-shadow: none;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.document-chip:hover {
+  transform: scale(1.04);
+  background-color: #fce9e4;
+}
+
+.document-chip.selected {
+  background-color: #f5bfb3;
+  color: #6b2e25;
+  transform: scale(1.05);
+}
+
+
+/* =========================================
+   🧠 SUBPREGUNTAS COMO BOTONES
+========================================= */
+
+.subquestions {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 16px;
+  font-family: 'Inter', 'Segoe UI', sans-serif;
+}
+
+.chip-button {
+  background: linear-gradient(135deg, #27ae60, #a3d9c9);
+  color: #0f0f11;
+  font-size: clamp(13px, 1.5vw, 15px);
+  font-weight: 500;
+  padding: 10px 18px;
+  border: none;
+  border-radius: 24px;
+  margin: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+
+.chip-button:hover {
+  background-color: #1D8348;
+  color: #fff;
+  transform: scale(1.04);
+}
+
+.volver-documentos-btn {
+  margin-top: 4px;
+  background: linear-gradient(135deg, #a3d9c9, #2ecc71);
+  color: #1e1e1e;
+  font-size: clamp(13px, 1.4vw, 14.5px);
+  font-weight: 500;
+  padding: 8px 18px;
+  border: none;
+  border-radius: 22px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.volver-documentos-btn:hover {
+  background-color: #fffef8;
+  color: white;
+  transform: scale(1.04);
+}
+
+/* =========================================
+   ✨ ANIMACIÓN ENTRADA DOCUMENTOS / SUBPREGUNTAS
+========================================= */
+
+/* Estado base oculto (cuando entra al DOM) */
+.fade-in {
+  opacity: 0;
+  transform: translateY(12px);
+  animation: fadeInUp 0.4s ease-out forwards;
+}
+
+/* Keyframes para fade + slide */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* =========================================
+   👍👎 COPIAR Y FEEDBACK - Responsive
+========================================= */
+
+.feedback-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 10px;
+  font-size: 18px;
+  color: #888;
+  flex-wrap: wrap; /* ajuste en móviles */
+}
+
+.feedback-actions i {
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+}
+
+.feedback-actions .fa-thumbs-up:hover,
+.feedback-actions .fa-thumbs-down:hover {
+  color: #ec7063;
+  transform: scale(1.2);
+}
+
+.feedback-actions .liked,
+.feedback-actions .disliked {
+  color: #ec7063;
+  animation: pulseLike 0.4s ease;
+}
+
+.feedback-actions .fa-copy:hover,
+.feedback-actions .fa-copy.copied {
+  color: #ec7063;
+}
+
+@keyframes pulseLike {
+  0% {
+    transform: scale(1);
+  }
+  30% {
+    transform: scale(1.25);
+  }
+  60% {
+    transform: scale(0.95);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+/* Tooltip copiado */
+.copy-tooltip {
+  position: absolute;
+  bottom: 120%;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: rgba(236, 112, 99, 0.35);
+  color: #2e2e2e;
+  padding: 6px 12px;
+  font-size: clamp(11px, 1.5vw, 13px);
+  border-radius: 8px;
+  white-space: nowrap;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  opacity: 0;
+  animation: fadeTooltip 2.4s ease-out forwards;
+  pointer-events: none;
+  z-index: 1000;
+}
+
+@keyframes fadeTooltip {
+  0% {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  15%, 85% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+}
