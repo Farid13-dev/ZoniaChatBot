@@ -1,0 +1,4 @@
+# Esta carpeta debe existir: qa_docs la monta como estatico (/corpus_emb) y
+# el backend falla al arrancar si no esta.
+# Los PDF del corpus NO se versionan: son documentos institucionales que se
+# cargan desde la interfaz de administracion (UPLOAD PDF).
