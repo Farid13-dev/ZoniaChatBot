@@ -1,0 +1,45 @@
+# --- Contexto de build: mantenerlo pequeno ---
+# Sin esto se enviaban 18 GB (models/) al daemon en cada build.
+
+# Modelos y datos pesados: van montados como volumen, NO copiados a la imagen
+models/
+corpus_emb/
+salida/
+*.m4a
+*.wav
+*.mp3
+*.onnx
+
+# Entornos y dependencias (se instalan dentro de la imagen)
+zoniaenv/
+.venv/
+venv/
+node_modules/
+.angular/
+
+# Artefactos de build
+dist/
+*.egg-info/
+*.whl
+__pycache__/
+*.py[cod]
+
+# Bases de datos y estado local
+*.db
+*.sqlite3
+session/
+uploads/
+voices/
+
+# Control de versiones e IDE
+.git/
+.gitignore
+.idea/
+.vscode/
+.gradio/
+
+# Basura
+*.log
+*.tmp
+*.bak
+*.swp

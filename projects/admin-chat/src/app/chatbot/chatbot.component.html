@@ -1,0 +1,190 @@
+<div class="chatbot-container">
+  <!-- Cabecera mejor alineada -->
+  <div class="chat-header d-flex justify-content-between align-items-center mb-2">
+    <!-- Título -->
+    <h2 class="mb-0">🤖 Zonia - Admin</h2>
+
+    <!-- Estado de la sesión -->
+    <div class="d-flex align-items-center gap-3">
+      <div class="text-muted small text-end">
+        ⏱️ {{ sessionDuration }}
+        @if (inactive) {
+          <span>| 💤 {{ inactivityDuration }}</span>
+        }
+      </div>
+
+      <!-- Botón de menú -->
+      <div style="position: relative;">
+        <button class="btn-toggle-admin" (click)="toggleOptionsMenu()">☰ Menú</button>
+
+        <!-- Menú desplegable -->
+        <div class="options-menu" [ngClass]="{'show': isOptionsMenuVisible}">
+          <div class="menu-option" (click)="toggleASR()">
+            <i [ngClass]="isASRActive ? 'fas fa-microphone-slash' : 'fas fa-microphone'"
+            [style.color]="isASRActive ? '#ffffff' : '#ffffffb3'"></i>
+            {{ isASRActive ? 'Desactivar ASR' : 'Activar ASR' }}
+          </div>
+
+          <div class="menu-option" (click)="toggleOCR()">
+            <i [ngClass]="isOCRActive ? 'fas fa-eye-slash' : 'fas fa-eye'"
+            [style.color]="isOCRActive ? '#ffffff' : '#ffffffb3'"></i>
+            {{ isOCRActive ? 'Desactivar OCR' : 'Activar OCR' }}
+          </div>
+
+          <!-- 🔊 TTS global -->
+          <div class="menu-option" (click)="toggleGlobalTTS()">
+            <i [ngClass]="isTTSActive ? 'fas fa-volume-mute' : 'fas fa-volume-up'"
+            [style.color]="isTTSActive ? '#ffffff' : '#ffffffb3'"></i>
+            {{ isTTSActive ? 'Desactivar TTS' : 'Activar TTS' }}
+          </div>
+
+          <!-- ❓ Subpreguntas global -->
+          <div class="menu-option" (click)="toggleGlobalSUB()">
+            <i [ngClass]="generateSubquestions ? 'fas fa-question-circle' : 'far fa-question-circle'"
+            [style.color]="generateSubquestions ? '#ffffff' : '#ffffffb3'"></i>
+            {{ generateSubquestions ? 'Desactivar Subpreguntas' : 'Activar Subpreguntas' }}
+          </div>
+
+
+          @if (sessionUUID && !sessionFinalizada) {
+            <div class="menu-option" (click)="deleteSession()">
+              <i class="fas fa-trash-alt"></i> Cerrar Sesión
+            </div>
+          }
+
+          @if (!sessionUUID || sessionFinalizada) {
+            <div class="menu-option" (click)="iniciar_session()">
+              <i class="fas fa-play-circle"></i> Iniciar nueva sesión
+            </div>
+          }
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- Chat -->
+  <div class="chat-messages" #chatContainer>
+    @if (sessionCerrada) {
+      <div class="session-closed-banner">
+        <div class="banner-content">
+          <span class="emoji">🔒</span>
+          <div>
+            <p class="title">Tu sesión ha finalizado</p>
+            <p class="subtitle">Por seguridad, la conversación ha sido cerrada.</p>
+          </div>
+          <button class="btn-restart" (click)="iniciar_session()">Iniciar nueva sesión</button>
+        </div>
+      </div>
+    }
+
+    @for (message of messages; track message) {
+      <div class="message-row"
+        [ngClass]="{ 'user': message.sender === 'user', 'bot': message.sender === 'bot' }">
+        <div class="avatar">{{ message.sender === 'user' ? '🧑' : '🤖' }}</div>
+        <div class="message-bubble">
+          <div class="mb-1" [innerHTML]="message.text"></div>
+          <!-- 📘 Documentos sugeridos con animación -->
+          @if (message.documentSuggestions && !documentoSeleccionado) {
+            <div
+              class="document-list my-3 fade-in">
+              @for (categoria of objectKeys(message.documentSuggestions); track categoria) {
+                @for (doc of message.documentSuggestions[categoria]; track doc) {
+                  <button
+                    class="btn w-100 text-start mb-2 document-button"
+                  [ngClass]="{
+                  'btn-outline-primary': documentoSeleccionadoId !== doc.id,
+                  'btn-primary active': documentoSeleccionadoId === doc.id
+                }"
+                    (click)="seleccionarDocumento(doc)">
+                    {{ doc.categoria }}
+                  </button>
+                }
+              }
+            </div>
+          }
+          <!-- 📚 Fuentes + Feedback -->
+          <div class="feedback-block mt-3">
+            <!-- Fuentes -->
+            @if (message.sources?.length) {
+              <div>
+                <button class="toggle-sources-button mb-2" (click)="message.showSources = !message.showSources">
+                  <span>{{ message.showSources ? '🔽 Ocultar fuentes' : '🔼 Mostrar fuentes' }}</span>
+                </button>
+                @if (message.showSources) {
+                  <div class="source-list-elegant">
+                    @for (fuente of message.sources; track fuente) {
+                      <a
+                        class="source-item-elegant text-decoration-none"
+                        [href]="fuente.url"
+                        target="_blank"
+                        rel="noopener">
+                        📄 <span class="doc-name">{{ fuente.documento }}</span>
+                        <span class="page-number">— pág. {{ fuente.pagina }}</span>
+                      </a>
+                    }
+                  </div>
+                }
+              </div>
+            }
+            <!-- Feedback -->
+            @if (message.question_id && message.answer_id) {
+              <div class="feedback-buttons mt-3">
+                <span class="feedback-label">¿Te fue útil?</span>
+                <button class="btn-feedback"
+                  [class.voted]="message.feedback === 'like'"
+                  (click)="likeAnswer(message.question_id, message.answer_id, message)">
+                  👍 Sí
+                </button>
+                <button class="btn-feedback"
+                  [class.voted]="message.feedback === 'dislike'"
+                  (click)="dislikeAnswer(message.question_id, message.answer_id, message)">
+                  👎 No
+                </button>
+              </div>
+            }
+          </div>
+        </div>
+      </div>
+      <!-- 🧠 Subpreguntas del modelo -->
+      @if (message.subquestions?.length || mostrarBotonVolverADocumentosConSubpreguntas(message)) {
+        <div
+          class="subquestions-wrapper text-center mt-2 mb-3">
+          <div class="d-flex flex-wrap justify-content-center gap-2">
+            <!-- Subpreguntas generadas por el modelo -->
+            @for (sub of message.subquestions; track sub) {
+              <button
+                class="btn btn-outline-secondary btn-sm subquestion-button"
+                (click)="enviarPreguntaStream(sub, documentoSeleccionadoId!)">
+                {{ sub }}
+              </button>
+            }
+            @if (mostrarBotonVolverADocumentosConSubpreguntas(message)) {
+              <button
+                class="btn btn-outline-primary btn-sm subquestion-button volver-documentos-button mt-2"
+                (click)="volverAVerDocumentos()">
+                ❓ ¿Deseas volver a ver la lista de documentos?
+              </button>
+            }
+          </div>
+        </div>
+      }
+    }
+  </div>
+
+  <!-- 💬 Input de mensaje -->
+  <div class="chat-input">
+    <input type="text" [(ngModel)]="messageInput" placeholder="Escribe tu mensaje..."
+      (keydown.enter)="handleUserInput()"/>
+      <button (click)="handleUserInput()" [disabled]="!messageInput.trim() || processing || !documentoSeleccionado">
+        Enviar
+      </button>
+    </div>
+
+    <!-- ⏳ Loading -->
+    @if (processing) {
+      <div class="loading mt-2 text-center">
+        ⏳ Procesando respuesta...
+      </div>
+    }
+  </div>
