@@ -76,7 +76,7 @@ rerank:
     model_name: ../models/jinaai/jina-reranker-v2-base-multilingual
     tokenizer_name: ../models/jinaai/jina-reranker-v2-base-multilingual
     device: cuda
-    top_n: 3
+    top_n: 2
     max_length: 1024
     batch_size: 8
     token: '10'
@@ -91,13 +91,13 @@ llm:
     local: []
   selected:
     provider: groq
-    model_name: qwen/qwen3.8-27b
-    tokenizer_name: qwen/qwen3.8-27b
+    model_name: openai/gpt-oss-20b
+    tokenizer_name: openai/gpt-oss-20b
     api_key: ${oc.env:GROQ_API_KEY,""}
     api_base: https://api.groq.com/openai/v1
     context_window: 32768
     max_tokens: 512
-    temperature: 0.6
+    temperature: 0.7
     top_p: 0.9
     top_k: 10
     num_beams: 3
