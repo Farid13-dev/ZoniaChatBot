@@ -1,4 +1,9 @@
 {
-  // For more information, visit: https://go.microsoft.com/fwlink/?linkid=827846
-  "recommendations": ["angular.ng-template"]
+  "recommendations": [
+    "angular.ng-template",        // plantillas Angular: autocompletado y errores
+    "ms-python.python",           // depuracion y entornos Python
+    "ms-python.vscode-pylance",   // analisis estatico
+    "ms-azuretools.vscode-docker",// Milvus, etcd, MinIO y Attu
+    "redhat.vscode-yaml"          // config_process.yaml y los docker-compose
+  ]
 }
