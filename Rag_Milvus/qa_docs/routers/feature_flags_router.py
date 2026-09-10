@@ -25,7 +25,7 @@ async def get_flags(request: Request):
 
 @router_feature_flags.post("/toggle")
 async def toggle_flag(req: ToggleRequest, request: Request):
-    if req.token != ADMIN_TOKEN:
+    if not ADMIN_TOKEN or req.token != ADMIN_TOKEN:
         raise HTTPException(status_code=403, detail="No autorizado")
 
     if req.key not in VALID_KEYS:

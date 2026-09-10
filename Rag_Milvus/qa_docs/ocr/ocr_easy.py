@@ -25,7 +25,9 @@ logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(me
 
 # Cargar .env
 load_dotenv()
-ADMIN_TOKEN = os.getenv("ADMIN_TOKEN", "supersecreto123")
+# Sin ADMIN_TOKEN en el entorno no hay token valido: los endpoints de
+# administracion quedan cerrados en vez de aceptar un default conocido.
+ADMIN_TOKEN = os.getenv("ADMIN_TOKEN", "")
 
 app = FastAPI()
 
@@ -99,7 +101,7 @@ async def notify_clients():
 async def toggle_ocr(data: OCRToggleRequest):
     global ocr_active, reader
 
-    if data.token != ADMIN_TOKEN:
+    if not ADMIN_TOKEN or data.token != ADMIN_TOKEN:
         raise HTTPException(status_code=403, detail="No autorizado")
 
     ocr_active = data.state

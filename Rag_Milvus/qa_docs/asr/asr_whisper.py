@@ -36,7 +36,9 @@ logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(me
 
 # Cargar variables del entorno
 load_dotenv()
-ADMIN_TOKEN = os.getenv("ADMIN_TOKEN", "supersecreto123")
+# Sin ADMIN_TOKEN en el entorno no hay token valido: los endpoints de
+# administracion quedan cerrados en vez de aceptar un default conocido.
+ADMIN_TOKEN = os.getenv("ADMIN_TOKEN", "")
 
 # Raiz del proyecto calculada desde ESTE archivo, no desde el directorio de
 # arranque:  .../ZoniaChatBot/Rag_Milvus/qa_docs/asr/asr_whisper.py
@@ -134,7 +136,7 @@ async def notify_asr_clients():
 async def toggle_asr(data: ASRToggleRequest):
     global asr_active, whisper_model, processor
 
-    if data.token != ADMIN_TOKEN:
+    if not ADMIN_TOKEN or data.token != ADMIN_TOKEN:
         raise HTTPException(status_code=403, detail="No autorizado para cambiar el estado del ASR.")
 
     asr_active = data.state
