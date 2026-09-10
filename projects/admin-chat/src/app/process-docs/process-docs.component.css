@@ -1,0 +1,224 @@
+/* --- Contenedor general --- */
+.admin-container {
+  padding: 10px;
+  background-color: #f5f7fa;
+  min-height: 10vh;
+}
+
+/* --- Título General --- */
+h1 {
+  font-size: 18px;
+  color: #2c3e50;
+  margin-bottom: 10px;
+}
+
+/* --- Diseño Grid --- */
+.grid-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 24px;
+}
+
+/* --- Secciones de configuración --- */
+.config-section {
+  background: #ffffff;
+  padding: 24px;
+  border-radius: 12px;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.05);
+  transition: transform 0.3s;
+}
+
+.config-section:hover {
+  transform: translateY(-3px);
+}
+
+/* --- Fieldsets --- */
+fieldset {
+  border: none;
+  padding: 0;
+}
+
+legend {
+  font-size: 20px;
+  font-weight: bold;
+  margin-bottom: 16px;
+  color: #34495e;
+}
+
+/* --- Inputs, Selects, Sliders --- */
+input,
+select,
+textarea {
+  width: 100%;
+  padding: 10px 14px;
+  margin-top: 6px;
+  margin-bottom: 18px;
+  font-size: 16px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  background: #fafafa;
+  transition: border 0.3s, background 0.3s;
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+  border-color: #3498db;
+  background: #fff;
+  outline: none;
+}
+
+/* --- Labels --- */
+label {
+  font-weight: 600;
+  color: #34495e;
+  margin-top: 10px;
+  display: block;
+}
+
+/* --- Sliders especiales --- */
+/* Sliders finos, discretos y dentro del contenedor */
+input[type="range"] {
+  width: calc(100% - 4px); /* Evita overflow sutil */
+  height: 4px; /* 👈 MÁS FINO */
+  padding: 2px;
+  box-sizing: border-box;
+  background: #ddd; /* Color de pista */
+  border-radius: 3px;
+  appearance: none;
+  margin-top: 6px;
+  margin-bottom: 16px;
+}
+
+/* Estilo del "thumb" (el punto que arrastras) */
+input[type="range"]::-webkit-slider-thumb {
+  appearance: none;
+  width: 14px;
+  height: 14px;
+  background: #3498db; /* Azul bonito */
+  border-radius: 50%;
+  cursor: pointer;
+  margin-top: -2px; /* Centrar mejor el thumb */
+  border: 2px solid white;
+  box-shadow: 0 0 2px rgba(0, 0, 0, 0.2);
+}
+
+/* Firefox */
+input[type="range"]::-moz-range-thumb {
+  width: 14px;
+  height: 14px;
+  background: #3498db;
+  border: 2px solid white;
+  border-radius: 50%;
+  cursor: pointer;
+  box-shadow: 0 0 2px rgba(0, 0, 0, 0.2);
+}
+
+/* IE/Edge (por compatibilidad, si quieres) */
+input[type="range"]::-ms-thumb {
+  width: 14px;
+  height: 14px;
+  background: #3498db;
+  border: 2px solid white;
+  border-radius: 50%;
+  cursor: pointer;
+  box-shadow: 0 0 2px rgba(0, 0, 0, 0.2);
+}
+
+/* Línea activa del slider (cuando haces click) */
+input[type="range"]:focus {
+  outline: none;
+  background: #ccc;
+}
+
+/* --- Botones --- */
+button {
+  font-weight: bold;
+  padding: 12px 20px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 16px;
+  transition: background 0.3s;
+}
+
+.btn-blue {
+  background-color: #3498db;
+  color: white;
+}
+
+.btn-blue:hover {
+  background-color: #2980b9;
+}
+
+.btn-green {
+  background-color: #2ecc71;
+  color: white;
+}
+
+.btn-green:hover {
+  background-color: #27ae60;
+}
+
+.button-group {
+  margin-top: 30px;
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+}
+
+/* --- Toggle botones para avanzados --- */
+.toggle-btn {
+  background-color: #ecf0f1;
+  color: #34495e;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  padding: 8px 12px;
+  width: 100%;
+  text-align: center;
+  margin-top: 12px;
+  font-weight: 600;
+}
+
+.toggle-btn:hover {
+  background-color: #dfe6e9;
+}
+
+/* --- Opciones avanzadas --- */
+.advanced-options {
+  margin-top: 12px;
+  padding: 15px;
+  background-color: #f9f9f9;
+  border-left: 4px solid #3498db;
+  border-radius: 8px;
+  overflow: hidden; /* 👈 MUY IMPORTANTE para evitar desbordes */
+}
+
+.advanced-options input,
+.advanced-options select,
+.advanced-options textarea {
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  box-sizing: border-box; /* 👈 Garantiza que padding y border no agranden el input */
+}
+
+/* --- Mejorar visibilidad en Textareas generales --- */
+textarea {
+  width: 100%;
+  resize: vertical; /* Permite solo crecer hacia abajo */
+  overflow: auto;
+  box-sizing: border-box;
+  padding: 10px;
+  font-family: monospace;
+  font-size: 14px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  background: #fafafa;
+  transition: border 0.3s, background 0.3s;
+}
+
+/* --- Slider-group separación --- */
+.slider-group {
+  margin-bottom: 20px;
+}

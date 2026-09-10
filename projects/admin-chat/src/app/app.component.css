@@ -1,0 +1,64 @@
+.admin-container {
+  max-width: 1400px;
+  margin: auto;
+  padding: 10px;
+  text-align: center;
+}
+
+h1 {
+  color: #2c3e50;
+  font-size: 22px;
+  margin-bottom: 10px;
+}
+
+/* --- Pestañas --- */
+.tabs {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  border-bottom: 3px solid #ddd;
+  margin-bottom: 20px;
+}
+
+.tabs button {
+  padding: 10px 20px;
+  background: #ecf0f1;
+  border: none;
+  border-radius: 8px 8px 0 0;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: bold;
+  color: #34495e;
+  transition: background 0.3s, transform 0.3s;
+}
+
+.tabs button:hover {
+  background: #d0d7dc;
+  transform: translateY(-2px);
+}
+
+.tabs button.active {
+  background: linear-gradient(to right, #00cc88, #00b374); /* 🌈 Gradiente suave verde */
+  color: white;
+  font-weight: bold;
+  border-bottom: 3px solid #00a366; /* Un poquito más oscuro para el borde */
+}
+
+/* --- Contenido de pestañas --- */
+.tab-content {
+  padding: 20px;
+  border: 1px solid #ddd;
+  border-radius: 0 0 8px 8px;
+  background: #ffffff;
+  animation: fadeIn 0.5s ease;
+}
+
+/* --- Animación Fade In --- */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
