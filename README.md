@@ -596,7 +596,7 @@ cp .env.example .env
 | Variable | Para qué |
 |---|---|
 | `GROQ_API_KEY` | Clave de <https://console.groq.com>. El YAML la lee como `${oc.env:GROQ_API_KEY,""}` |
-| `ADMIN_TOKEN` | Token que protege los feature flags del panel de administración |
+| `ADMIN_TOKEN` | Token que protege los endpoints de administración. **Sin definir, responden `403`.** Debe coincidir con `adminToken` en `projects/*/src/environments/environment.ts` |
 | `MILVUS_HOST` | `localhost` en local, `standalone` dentro de Docker |
 | `WHISPER_MODEL` | Ruta a otro modelo de ASR (opcional) |
 | `LLM_CONCURRENCY` | Consultas simultáneas al LLM (por defecto, mitad de núcleos) |
@@ -907,9 +907,12 @@ defectos de diseño: funcionaban en el entorno original (Python 3.11, CUDA 12.x)
   `jina-reranker-v2` importa `create_position_ids_from_input_ids`, que `transformers` 5 eliminó.
   Por lo mismo, `sentence-transformers` no puede pasar de **5.1.2**. Cambiar de reranker no es
   alternativa: `ms-marco-MiniLM` es solo inglés y el corpus es español.
-- **El token de administrador está embebido en el bundle del frontend**
-  (`projects/*/src/environments/environment.ts`). Es aceptable en un prototipo local; **no usar tal
-  cual en producción**: debe moverse a un flujo de autenticación real en el servidor.
+- **El token de administrador viaja en el bundle del frontend**
+  (`projects/*/src/environments/environment.ts`). Cualquiera que abra el sitio puede leerlo. El
+  repositorio no trae ningún valor por defecto —`adminToken` viene vacío y `ADMIN_TOKEN` sin
+  definir deja los endpoints de administración devolviendo `403`—, pero el mecanismo sigue siendo
+  el de un prototipo: **no usar tal cual en producción**, debe sustituirse por autenticación real
+  en el servidor.
 - **Concurrencia de prototipo.** El sistema se diseñó y midió para 1 administrador + 1 usuario
   simultáneos en red local. No hay pruebas de carga.
 - **OCR en CPU.** `easyocr.Reader` se instancia con `gpu=False` por estabilidad; es el paso más
